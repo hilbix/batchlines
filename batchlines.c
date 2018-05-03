@@ -14,6 +14,7 @@ static int		nosync;
 static char		eol_i, eol_o;
 static int		width;
 static int		safemode;
+static int		quiet;
 
 /* calculated	*/
 static char		*intermediate;
@@ -109,12 +110,12 @@ batchlines(void)
     tino_alarm_set(timeout, timed_rotate, NULL);
 
   lines	= 0;
-  while ((line = tino_buf_line_read(&ibuf, 0, eol_i))!=0)
+  while ((line = tino_buf_whole_line_readE(&ibuf, 0, eol_i))!=0)
     {
       lines++;
       tino_buf_add_sO(&obuf, line);
       tino_buf_add_cO(&obuf, eol_o);
-      if (!maxlines || lines < maxlines )
+      if (!maxlines || lines < maxlines)
         flusher(0);
       else
         {
@@ -123,6 +124,8 @@ batchlines(void)
         }
     }
   rotate(1);
+  if (!quiet && tino_buf_write_away_allE(&ibuf, 1, -1))
+    tino_exit("error: cannot write last incomplete line to stdout");
   return 0;
 }
 
@@ -167,6 +170,10 @@ main(int argc, char **argv)
                       "o char	input linefeed character ('' is NUL, NUL is always EOL)"
                       , &eol_o,
                       '\n',
+
+                      TINO_GETOPT_FLAG
+                      "q	quiet (do not output last incomplete line)"
+                      , &quiet,
 
                       TINO_GETOPT_FLAG
                       "s	safe mode (try not to overwrite files)"
