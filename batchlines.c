@@ -9,7 +9,7 @@
 
 /* options	*/
 static const char	*filename, *tmpext;
-static long		timeout, maxlines;
+static unsigned long	timeout, maxlines;
 static int		nosync;
 static char		eol_i, eol_o;
 static int		width;
@@ -138,12 +138,13 @@ main(int argc, char **argv)
   argn	= tino_getopt(argc, argv, 1, 0,
                       TINO_GETOPT_VERSION(BATCHLINES_VERSION)
                       " filename [.ext..]\n"
-                      "	Write stdin to given filename.tmp, line-by-line. (.tmp see -i)\n"
+                      "	Write stdin to given filename.tmp, line-by-line. (.tmp see -e)\n"
                       "	At the end sync file and rename it to filename.ext (atomically)\n"
                       "	Multiple .ext are cycled, missing .ext is '' (none)\n"
                       "	The incomplete last lines (missing NL) is written to stdout.\n"
                       "	On SIGUSR1, file is synced plus rotated to filename.NNN.ext\n"
                       "	Rotation can be done after given time (-t) or lines (-n), too"
+                      ,
 
                       TINO_GETOPT_USAGE
                       "h	this help"
@@ -161,8 +162,8 @@ main(int argc, char **argv)
                       , &eol_i,
                       '\n',
 
-                      TINO_GETOPT_LONGINT
-                      "n lines	rotate after the given number of lines (default: 0=never)"
+                      TINO_GETOPT_ULONGINT
+                      "n max	rotate after the given number of lines (default: 0=never)"
                       , &maxlines,
 
                       TINO_GETOPT_CHAR
@@ -179,7 +180,7 @@ main(int argc, char **argv)
                       "s	safe mode (try not to overwrite files)"
                       , &safemode,
 
-                      TINO_GETOPT_LONGINT
+                      TINO_GETOPT_ULONGINT
                       TINO_GETOPT_TIMESPEC
                       "t sec	rotate after the given timeout in seconds (default: 0=none)"
                       , &timeout,
@@ -189,10 +190,12 @@ main(int argc, char **argv)
                       , &nosync,
 
                       TINO_GETOPT_INT
+                      TINO_GETOPT_MIN
                       TINO_GETOPT_DEFAULT
-                      "w nr	counter width (for numbered rotates)"
+                      "w nr	width of counter (for numbered rotates)"
                       , &width,
                       1,
+		      1,
 
                       NULL
                       );
