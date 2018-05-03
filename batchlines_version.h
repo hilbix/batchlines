@@ -1,1 +1,1 @@
-#define BATCHLINES_VERSION "0.0.0"
+#define BATCHLINES_VERSION "0.0.1"
