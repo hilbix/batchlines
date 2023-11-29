@@ -168,7 +168,7 @@ main(int argc, char **argv)
 
                       TINO_GETOPT_CHAR
                       TINO_GETOPT_DEFAULT
-                      "o char	input linefeed character ('' is NUL, NUL is always EOL)"
+                      "o char	output linefeed character ('' is NUL, NUL is always EOL)"
                       , &eol_o,
                       '\n',
 
@@ -195,7 +195,7 @@ main(int argc, char **argv)
                       "w nr	width of counter (for numbered rotates)"
                       , &width,
                       1,
-		      1,
+                      1,
 
                       NULL
                       );
